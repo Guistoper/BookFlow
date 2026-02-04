@@ -1,6 +1,3 @@
-CREATE DATABASE biblioteca;
-USE biblioteca;
-
 CREATE TABLE tb_livros (
 	id_liv INT PRIMARY KEY AUTO_INCREMENT,
 	livro VARCHAR(255) NOT NULL,
@@ -28,8 +25,7 @@ CREATE TABLE tb_emprestimos (
 	quantidade INT NOT NULL,
 	data DATE NOT NULL,
 	prazo DATE NOT NULL,
-	status VARCHAR(9),
+	status VARCHAR(9) NOT NULL,
 	FOREIGN KEY (id_usa) REFERENCES tb_usuarios(id_usa),
 	FOREIGN KEY (id_liv) REFERENCES tb_livros(id_liv)
 )
-	
