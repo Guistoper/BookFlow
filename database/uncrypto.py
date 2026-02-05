@@ -9,12 +9,12 @@ class PasswordReader:
         env_path = os.path.join(base_dir, filename)
         # carrega a chave de criptografia
         if not os.path.exists(key_path):
-            raise FileNotFoundError("DEBUG: Chave de criptografia (secret.key) não encontrada.")
+            raise FileNotFoundError("UNCRYPTO: Chave de criptografia (secret.key) não encontrada.")
         with open(key_path, "rb") as key_file:
             key = key_file.read()
         # lê o arquivo env criptografado
         if not os.path.exists(env_path):
-             raise FileNotFoundError(f"DEBUG: Arquivo de senha ({filename}) não encontrado.")
+             raise FileNotFoundError(f"UNCRYPTO: Arquivo de senha ({filename}) não encontrado.")
         encrypted_token = None
         try:
             with open(env_path, "r") as file:
@@ -26,11 +26,11 @@ class PasswordReader:
                     end_quote = content.rfind("'")
                     encrypted_token = content[start_quote:end_quote]
         except Exception as e:
-            raise ValueError(f"DEBUG: Erro ao ler o arquivo env ({e})")
+            raise ValueError(f"UNCRYPTO: Erro ({e})")
         # descriptografa a senha
         try:
             f = Fernet(key)
             decrypted_password = f.decrypt(encrypted_token.encode()).decode()
             return decrypted_password
         except Exception as e:
-            raise ValueError(f"DEBUG: Falha na descriptografia. A chave pode estar incorreta ({e})")
+            raise ValueError(f"UNCRYPTO: Erro ({e})")

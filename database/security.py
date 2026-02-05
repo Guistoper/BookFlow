@@ -6,6 +6,7 @@ import ctypes
 
 class PasswordGenerator:
     def __generate_password(length):
+        print("SECURITY: Iniciando gerador de senha...")
         letters = string.ascii_letters
         numbers = string.digits
         symbols = "-_+=." 
@@ -39,7 +40,7 @@ class PasswordGenerator:
                     pass
                 return key
             except IOError as e:
-                print(f"DEBUG: Erro ao salvar a chave de criptografia ({e})")
+                print(f"SECURITY: Erro ({e})")
                 return None
 
     def __save_password(password, filename="mysql.env"):
@@ -63,22 +64,18 @@ class PasswordGenerator:
                 ctypes.windll.kernel32.SetFileAttributesW(filepath, 0x02)
             except:
                 pass
-            print(f"DEBUG: Senha criptografada e salva com sucesso em {os.path.abspath(filepath)}")
+            print(f"SECURITY: Senha criptografada e salva com sucesso ({os.path.abspath(filepath)})")
         except IOError as e:
-            print(f"DEBUG: Erro ao salvar o arquivo ({e})")
+            print(f"SECURITY: Erro ({e})")
 
     def _check_password_file(filename="mysql.env"):
         return os.path.isfile(os.path.join(os.path.dirname(__file__), "data", filename))
 
     def _main():
-        print("DEBUG: Iniciando verificação de senha...")
+        print("SECURITY: Iniciando verificação de senha...")
         if PasswordGenerator._check_password_file():
-            print("DEBUG: Arquivo de senha já existe. Nenhuma ação necessária.")
+            print("SECURITY: Arquivo de senha existente")
             return
-        print("DEBUG: Gerando senha segura para o Root do MySQL...")
         new_password = PasswordGenerator.__generate_password(length=24)
         # a lógica de salvar agora inclui a criptografia internamente
         PasswordGenerator.__save_password(new_password)
-
-if __name__ == "__main__":
-    PasswordGenerator._main()

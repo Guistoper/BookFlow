@@ -1,3 +1,3 @@
-DROP DATABASE IF EXISTS biblioteca;
-CREATE DATABASE biblioteca;
-USE biblioteca;
+DROP DATABASE IF EXISTS bookflow;
+CREATE DATABASE bookflow;
+USE bookflow;
