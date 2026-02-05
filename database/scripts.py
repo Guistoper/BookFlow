@@ -1,6 +1,6 @@
-from server import MySQLInstallerWindows
+from database.server import MySQLInstallerWindows
+from database.uncrypto import PasswordReader
 from dotenv import load_dotenv
-from mysql.connector import errorcode
 import mysql.connector
 import os
 import sys
@@ -20,11 +20,33 @@ class MySQLScriptRunner:
             print("DEBUG: Conexão estabelecida com sucesso.")
             return cnx
         except mysql.connector.Error as err:
-            if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
-                print("DEBUG: Nome de usuário ou senha incorretos.")
-            else:
-                print(f"DEBUG: {err}")
+            print(f"DEBUG: {err}")
             return None
+        
+    def _check_database(password, database):
+        print(f"DEBUG: Iniciando verificação da existência do banco de dados '{database}'...")
+        # reutiliza o método privado de conexão da classe
+        cnx = MySQLScriptRunner.__get_connection(password)
+        if cnx is None:
+            print("DEBUG: Falha ao conectar para verificação.")
+            return False
+        try:
+            cursor = cnx.cursor()
+            # executa a query para verificar se o schema existe
+            cursor.execute(f"SHOW DATABASES LIKE '{database}'")
+            result = cursor.fetchone()
+            # fecha recursos temporários
+            cursor.close()
+            cnx.close()
+            if result:
+                print(f"DEBUG: O banco de dados '{database}' já existe.")
+                return True
+            else:
+                print(f"DEBUG: O banco de dados '{database}' não foi encontrado.")
+                return False
+        except mysql.connector.Error as err:
+            print(f"DEBUG: Erro ao verificar existência do banco: {err}")
+            return False
 
     def __run_sql_file(cursor, cnx, script_path):
         filename = os.path.basename(script_path)
@@ -52,36 +74,23 @@ class MySQLScriptRunner:
             cnx.commit()
             print(f"DEBUG: Sucesso ao executar {filename}.")
             return True
-
         except Exception as e:
             print(f"DEBUG: Erro crítico ao processar o arquivo ({e})")
             return False
 
     def _main():
-        # 1. checa se o MySQL está instalado
-        if MySQLInstallerWindows._check_mysql_installed() is False:
-            print("DEBUG: MySQL não está instalado.")
-            return
         print("DEBUG: Iniciando rotina de execução de scripts SQL...")
-        # 2. carrega a senha do arquivo mysql.env
-        env_path = r"database\data\mysql.env"
-        if not os.path.exists(env_path):
-             print(f"DEBUG: Arquivo de ambiente {env_path} não encontrado.")
-             return
-        load_dotenv(dotenv_path=env_path)
-        env_password = os.getenv("MYSQL_ROOT_PASSWORD")
-        if not env_password:
-            print("DEBUG: Senha não encontrada nas variáveis de ambiente.")
-            return
-        # 3. cria a conexão com o banco
-        cnx = MySQLScriptRunner.__get_connection(env_password)
+        # carrega a senha do arquivo mysql.env
+        unc_password = PasswordReader.get_mysql_password()
+        # cria a conexão com o banco
+        cnx = MySQLScriptRunner.__get_connection(unc_password)
         if cnx is None:
             return # encerra se não conectar
         cursor = cnx.cursor()
-        # 4. definição dos caminhos e ordem
+        # definição dos caminhos e ordem
         base_script_path = r"database\data\scripts"
         mandatory_scripts = ["database.sql", "tables.sql", "views.sql"]
-        # 5. executa os scripts obrigatórios
+        # executa os scripts obrigatórios
         for script_name in mandatory_scripts:
             full_path = os.path.join(base_script_path, script_name)
             success = MySQLScriptRunner.__run_sql_file(cursor, cnx, full_path)
@@ -90,7 +99,7 @@ class MySQLScriptRunner:
                 cursor.close()
                 cnx.close()
                 return
-        # 6. lógica opcional para o examples.sql
+        # lógica opcional para o examples.sql
         print("DEBUG: Scripts estruturais finalizados.")
         # input() pausa o script esperando o usuário
         user_input = input("DEBUG: Deseja popular o banco de dados com dados de exemplo? (S/N): ").strip().lower()
@@ -99,7 +108,7 @@ class MySQLScriptRunner:
             MySQLScriptRunner.__run_sql_file(cursor, cnx, examples_path)
         else:
             print("DEBUG: Pular etapa de exemplos.")
-        # 7. limpeza e fechamento
+        # limpeza e fechamento
         print("DEBUG: Encerrando conexões...")
         cursor.close()
         cnx.close()
