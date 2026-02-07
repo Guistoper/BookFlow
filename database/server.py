@@ -57,7 +57,7 @@ class MySQLInstallerWindows:
         # executa o instalador MSI
         print("SERVER: Iniciando a instalação dos produtos MySQL...")
         # 1. caminho do instalador MSI
-        msi_path = os.path.join("database\data", "windows-mysql-web-installer.msi")
+        msi_path = os.path.join("database", "data", "windows-mysql-web-installer.msi")
         try:
             # ETAPA 1: instalar o MySQL Installer
             # usamos /qn para ser totalmente silencioso

@@ -1,4 +1,4 @@
-from assets.app import RunApp
+from assets.app import BookFlowApp
 import customtkinter as ctk
 
 
@@ -11,7 +11,7 @@ WHITE_COLOR="#f0f0f0"
 
 # classe de rodar o app do login, onde o usuário insere suas credenciais para acessar o aplicativo principal
 # pode ser expandida para incluir mais formas de autenticação e outras funcionalidades relacionadas ao login
-class RunAppLogin(ctk.CTk):
+class BookFlowLogin(ctk.CTk):
     def __init__(self):
         super().__init__()
 
@@ -101,8 +101,7 @@ class RunAppLogin(ctk.CTk):
             # se as credenciais estiverem corretas, a janela de login é fechada e o aplicativo principal é iniciado, passando a janela de login como referência para o aplicativo principal, caso seja necessário retornar à tela de login no futuro
             if user == right[user] and password == right[password]:
                 self.withdraw()
-                app = RunApp(login_window=self)
-                app.mainloop()
+                BookFlowApp(login_window=self).mainloop()
             # se o usuário deixar campos vazios, ou inserir credenciais incorretas, a função de erro é chamada com um código diferente para exibir a mensagem de erro apropriada
             elif user == "" or password == "":
                 error(2)
