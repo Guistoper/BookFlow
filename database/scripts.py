@@ -74,7 +74,7 @@ class MySQLScriptRunner:
     def _main():
         print("SCRIPTS: Iniciando execução de scripts SQL...")
         # carrega a senha do arquivo mysql.env
-        unc_password = PasswordReader.get_mysql_password()
+        unc_password = PasswordReader._get_mysql_password()
         # cria a conexão com o banco
         cnx = MySQLScriptRunner.__get_connection(unc_password)
         if cnx is None:

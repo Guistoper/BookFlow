@@ -1,2 +1,4 @@
 database/data/mysql.env
 database/data/secret.key
+/database/__pycache__
+/assets/__pycache__

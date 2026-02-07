@@ -7,9 +7,13 @@ from assets.login import BookFlowLogin
 
 class BookFlow:
     def _main():
-        if not MySQLInstallerWindows._check_mysql_installed() or not PasswordGenerator._check_password_file():
+        if not PasswordGenerator._check_password_file() or not PasswordGenerator._check_password_secret() or not MySQLInstallerWindows._check_mysql_installed():
             MySQLInstallerWindows._main()
-        unc_password = PasswordReader.get_mysql_password()
+        try:
+            unc_password = PasswordReader._get_mysql_password()
+        except (FileNotFoundError, ValueError):
+            MySQLInstallerWindows._main()
+            unc_password = PasswordReader._get_mysql_password()
         if not MySQLScriptRunner._check_database(unc_password, "bookflow"):
             MySQLScriptRunner._main()
         MySQLConnect._get_connection(unc_password, "bookflow")

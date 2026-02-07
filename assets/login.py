@@ -8,6 +8,7 @@ TEXT_COLOR_WHITE="#ffffff"
 BLUE_COLOR="#206eff"
 BLUE_COLOR_HOVER="#1a54c8"
 WHITE_COLOR="#f0f0f0"
+WHITE_COLOR_HOVER="#cccccc"
 
 # classe de rodar o app do login, onde o usuário insere suas credenciais para acessar o aplicativo principal
 # pode ser expandida para incluir mais formas de autenticação e outras funcionalidades relacionadas ao login
@@ -16,21 +17,24 @@ class BookFlowLogin(ctk.CTk):
         super().__init__()
 
         # configurações da janela principal do login
-        self.title("BookFlow - Login")
+        self.title("BookFlow Login")
         self.geometry("1280x720")
         self.minsize(854, 480)
         self.resizable(True, True)
-        self.after(0, lambda: self.state('zoomed')) 
+        self.after(0, lambda: self.state('zoomed'))
 
         # configuração do layout e widgets da tela de login
         bg = ctk.CTkFrame(self, fg_color=BLUE_COLOR, corner_radius=0)
         bg.pack(fill="both", expand=True)
 
+        close_button = ctk.CTkButton(self, bg_color=BLUE_COLOR, text="X", command=self.destroy, width=50, height=50, corner_radius=15, fg_color=WHITE_COLOR, hover_color=WHITE_COLOR_HOVER, text_color=TEXT_COLOR_BLACK, font=("Arial", 20, "bold"))
+        close_button.place(relx=1, x=-50, y=50, anchor="ne")
+
         frame = ctk.CTkFrame(bg, fg_color="white", corner_radius=25)
         frame.place(relx=0.5, rely=0.5, anchor="center")
 
         # texto de cima
-        text_top = ctk.CTkLabel(frame, text="Login do Bookflow", text_color=TEXT_COLOR_BLACK, font=("Arial", 20, "bold"))
+        text_top = ctk.CTkLabel(frame, text="Bookflow Login", text_color=TEXT_COLOR_BLACK, font=("Arial", 20, "bold"))
         text_top.pack(pady=(20, 10))
 
         # texto do campo de colocar o nome de usuário
@@ -55,7 +59,7 @@ class BookFlowLogin(ctk.CTk):
         def error(wrong):
             # configurações da janela de erro, que é um Toplevel para criar uma janela modal sobre a janela de login, com um design consistente com o restante do aplicativo
             error = ctk.CTkToplevel(self, fg_color=BLUE_COLOR)
-            error.title("BookFlow - Erro")            
+            error.title("BookFlow Erro")            
             error.resizable(False, False)
             error.transient(self)
             error.grab_set()
@@ -80,7 +84,7 @@ class BookFlowLogin(ctk.CTk):
                 error_title.grid(row=0, column=0, pady=(20, 10), padx=20)
 
             # botão para fechar a janela de erro e permitir que o usuário tente fazer login novamente, com um design consistente com o restante do aplicativo
-            try_again = ctk.CTkButton(content_frame, text="Tentar novamente", fg_color=BLUE_COLOR, width=80, height=40, hover_color=BLUE_COLOR_HOVER, corner_radius=15, text_color=TEXT_COLOR_WHITE, command=close_error, font=("Arial", 16, "bold"))
+            try_again = ctk.CTkButton(content_frame, text="Tentar Novamente", fg_color=BLUE_COLOR, width=80, height=40, hover_color=BLUE_COLOR_HOVER, corner_radius=15, text_color=TEXT_COLOR_WHITE, command=close_error, font=("Arial", 16, "bold"))
             try_again.grid(row=1, column=0, sticky="s", pady=(10, 20))
 
             # centraliza a janela de erro sobre a janela de login, calculando as coordenadas com base nas dimensões da janela de erro e da janela de login, e usando o método geometry para posicionar a janela de erro corretamente

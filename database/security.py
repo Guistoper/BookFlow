@@ -21,19 +21,17 @@ class PasswordGenerator:
                 return password
 
     def __get_or_create_key():
-        # verifica se a chave de criptografia existe, se não, cria uma
         key_path = os.path.join(os.path.dirname(__file__), "data", "secret.key")
-        if os.path.exists(key_path):
+        # tenta ler a chave existente; se não existir, cria uma nova.
+        try:
             with open(key_path, "rb") as key_file:
                 return key_file.read()
-        else:
+        except FileNotFoundError:
             key = Fernet.generate_key()
             try:
-                # garante que o diretório existe
                 os.makedirs(os.path.dirname(key_path), exist_ok=True)
                 with open(key_path, "wb") as key_file:
                     key_file.write(key)
-                # oculta arquivo da chave no Windows (mesma lógica do seu código)
                 try:
                     ctypes.windll.kernel32.SetFileAttributesW(key_path, 0x02)
                 except:
@@ -44,22 +42,16 @@ class PasswordGenerator:
                 return None
 
     def __save_password(password, filename="mysql.env"):
-        # obtém a chave e criptografa a senha
         key = PasswordGenerator.__get_or_create_key()
-        if not key:
-            return # aborta se não conseguir chave
+        if not key: return 
         f = Fernet(key)
-        # criptografa a senha (retorna bytes, precisamos decodificar para string para salvar no env)
         encrypted_password = f.encrypt(password.encode()).decode()
-        # salva a senha criptografada no formato CHAVE=VALOR
         content = f"MYSQL_ROOT_PASSWORD='{encrypted_password}'"
         try:
             filepath = os.path.join(os.path.dirname(__file__), "data", filename)
-            os.makedirs(os.path.dirname(filepath), exist_ok=True) # garante pasta data
-            
+            os.makedirs(os.path.dirname(filepath), exist_ok=True)
             with open(filepath, "w") as file:
                 file.write(content)
-            # oculta arquivo no Windows
             try:
                 ctypes.windll.kernel32.SetFileAttributesW(filepath, 0x02)
             except:
@@ -70,12 +62,16 @@ class PasswordGenerator:
 
     def _check_password_file(filename="mysql.env"):
         return os.path.isfile(os.path.join(os.path.dirname(__file__), "data", filename))
+    
+    def _check_password_secret(filename="secret.key"):
+        return os.path.isfile(os.path.join(os.path.dirname(__file__), "data", filename))
 
     def _main():
         print("SECURITY: Iniciando verificação de senha...")
-        if PasswordGenerator._check_password_file():
+        if PasswordGenerator._check_password_file() and PasswordGenerator._check_password_secret():
             print("SECURITY: Arquivo de senha existente")
+            print("SECURITY: Chave de criptografia existente")
             return
+        # se chegou aqui, gera tudo
         new_password = PasswordGenerator.__generate_password(length=24)
-        # a lógica de salvar agora inclui a criptografia internamente
         PasswordGenerator.__save_password(new_password)
