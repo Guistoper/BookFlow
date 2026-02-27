@@ -8,7 +8,7 @@ class PasswordReader:
         base_dir = os.path.join(os.path.dirname(__file__), "data")
         key_path = os.path.join(base_dir, "secret.key")
         env_path = os.path.join(base_dir, filename)
-        # carrega a chave de criptografia (Otimização: tenta abrir direto)
+        # carrega a chave de criptografia (otimização: tenta abrir direto)
         try:
             with open(key_path, "rb") as key_file:
                 key = key_file.read()
