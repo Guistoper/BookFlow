@@ -1,0 +1,3 @@
+DROP DATABASE IF EXISTS bookflow;
+CREATE DATABASE bookflow;
+USE bookflow;
